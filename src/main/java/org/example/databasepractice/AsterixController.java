@@ -2,23 +2,34 @@ package org.example.databasepractice;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.*;
+// TODO: * implement a endpoint in the AsterixController that returns a Character based on its id.
+//  implement a endpoint in the AsterixController that deletes a Character based on its id.
+//  implement a endpoint in the AsterixController that updates a Character based on its id.
 
 @RequiredArgsConstructor
 @RestController
 public class AsterixController {
-private final CharacterRepo characterRepo;
+    private final AsterixService asterixService;
 
     @GetMapping("/asterix/characters")
-    List<Character> findAll(){
-        return characterRepo.findAll();
+    public List<Character> findAll(){
+        return asterixService.findAll();
     }
 
     @DeleteMapping("/asterix/characters/{id}")
-    List<Character>  deleteById(@PathVariable String id){
-        characterRepo.deleteById(id);
-        return characterRepo.findAll();
+    public List<Character>  deleteById(@PathVariable String id){
+        return asterixService.deleteById(id);
+    }
+
+    @PostMapping("/asterix/characters/create")
+    public Character createCharacter(@RequestBody CharacterDTO characterDTO){
+        return asterixService.createCharacter(characterDTO);
+    }
+
+    @PutMapping("/asterix/characters/update")
+    public Character updateCharacter(@RequestBody CharacterDTO characterDTO){
+        return asterixService.updateCharacter(characterDTO);
     }
 
 
