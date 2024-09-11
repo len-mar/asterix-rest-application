@@ -2,9 +2,9 @@ package org.example.databasepractice;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+
+import java.time.Instant;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -15,28 +15,25 @@ public class AsterixService {
         return characterRepo.findAll();
     }
 
-    // todo: how is this usually done? exceptions?
-    // todo: fix null return
     public Character findById(String id){
         Optional<Character> result = characterRepo.findById(id);
-        return result.orElse(null);
+        return result.orElseThrow(NoSuchElementException::new);
     }
 
-    public List<Character>  deleteById(String id){
+    public Character deleteById(String id){
+        Character deletedCharacter = characterRepo.findById(id).get();
         characterRepo.deleteById(id);
-        return characterRepo.findAll();
+        return deletedCharacter;
     }
 
     public Character createCharacter(CharacterDTO characterDTO){
-        return characterRepo.save(new Character(IdService.generateId(), characterDTO.name(), characterDTO.age(), characterDTO.occupation()));
+        return characterRepo.save(new Character(IdService.generateId(), characterDTO.name(), characterDTO.age(), characterDTO.occupation(), Instant.now()));
     }
 
-    // todo: is there another way other than creating a whole new character object? with timestamps, this would get tricky
-    // the solution is creation and modification timestamps
     public Character updateCharacter(CharacterDTO characterDTO){
         Character oldCharacter = characterRepo.findByName(characterDTO.name());
         return characterRepo.save(
-                new Character(oldCharacter.id(), characterDTO.name(), characterDTO.age(), characterDTO.occupation()));
+                new Character(oldCharacter.id(), characterDTO.name(), characterDTO.age(), characterDTO.occupation(), oldCharacter.creationTime()));
     }
 
 

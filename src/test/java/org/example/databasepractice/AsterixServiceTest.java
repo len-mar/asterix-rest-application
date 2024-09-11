@@ -4,7 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.example.databasepractice.IdService.generateId;
@@ -32,7 +34,7 @@ AsterixService asterixService = new AsterixService(mockCharacterRepo);
     void findById_returnsExpected_whenIdIsFound() {
         // given
         String id = "1";
-        Character expected = new Character(id, "Asterix", 50, "Alphawolf");
+        Character expected = new Character(id, "Asterix", 50, "Alphawolf", Instant.now());
         when(mockCharacterRepo.findById(id)).thenReturn(Optional.of(expected));
         // when
         Character actual = asterixService.findById(id);
@@ -47,9 +49,7 @@ AsterixService asterixService = new AsterixService(mockCharacterRepo);
         String id = "0";
         when(mockCharacterRepo.findById(id)).thenReturn(Optional.empty());
         // when
-        Character actual = asterixService.findById(id);
-        verify(mockCharacterRepo).findById(id);
-        assertNull(actual);
+        assertThrows(NoSuchElementException.class, () -> asterixService.findById(id));
     }
 
     // todo: actually test the delete
@@ -57,10 +57,10 @@ AsterixService asterixService = new AsterixService(mockCharacterRepo);
     void deleteById() {
         // given
         String id = "1";
-        List<Character> expected = List.of(new Character(id, "Asterix", 50, "Alphawolf"));
-        when(mockCharacterRepo.findAll()).thenReturn(expected);
+        Character expected = new Character(id, "Asterix", 50, "Alphawolf", Instant.now());
+        when(mockCharacterRepo.findAll()).thenReturn(List.of(expected));
         // when
-        List<Character> actual = asterixService.deleteById(id);
+        Character actual = asterixService.deleteById(id);
         assertEquals(expected,actual);
     }
 
@@ -69,11 +69,11 @@ AsterixService asterixService = new AsterixService(mockCharacterRepo);
         // given
         String id = "1";
         // fake "old" character we want to update
-        Character oldCharacter = new Character(id, "Asterix", 50, "Alphawolf");
+        Character oldCharacter = new Character(id, "Asterix", 50, "Alphawolf", Instant.now());
         // fake "new" character input
         CharacterDTO newCharacterDTO = new CharacterDTO("Asterix", 5, "None");
         // expected updated character (age & occupation different)
-        Character expected = new Character(id,"Asterix", 5, "None");
+        Character expected = new Character(id,"Asterix", 5, "None", oldCharacter.creationTime());
         when(mockCharacterRepo.findByName(oldCharacter.name())).thenReturn(oldCharacter);
         when(mockCharacterRepo.save(expected)).thenReturn(expected);
         // when
@@ -93,15 +93,19 @@ AsterixService asterixService = new AsterixService(mockCharacterRepo);
             // given
             mockedStatic.when(IdService::generateId).thenReturn(mockId);
             CharacterDTO newCharacterDTO = new CharacterDTO("Betarix", 20, "Beta");
-            Character expected = new Character(generateId(),"Betarix", 20, "Beta");
-            when(mockCharacterRepo.save(expected)).thenReturn(expected);
+            Character expected = new Character(generateId(),"Betarix", 20, "Beta", Instant.now());
+            when(mockCharacterRepo.save(any())).thenReturn(expected);
 
             // when
             Character actual = asterixService.createCharacter(newCharacterDTO);
-            verify(mockCharacterRepo).save(expected);
+            verify(mockCharacterRepo).save(any());
 
             // then
-            assertEquals(expected, actual);
+            assertEquals(expected.name(), actual.name());
+            assertEquals(expected.id(), actual.id());
+            assertEquals(expected.occupation(), actual.occupation());
+
+            assertTrue(actual.creationTime().isAfter(Instant.parse("2020-01-01T09:00:00.00Z")));
         }
 
 

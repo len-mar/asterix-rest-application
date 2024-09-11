@@ -18,7 +18,7 @@ public class AsterixController {
     }
 
     @DeleteMapping("/asterix/characters/{id}")
-    public List<Character>  deleteById(@PathVariable String id){
+    public Character  deleteById(@PathVariable String id){
         return asterixService.deleteById(id);
     }
 
