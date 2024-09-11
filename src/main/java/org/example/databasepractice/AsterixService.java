@@ -3,6 +3,7 @@ package org.example.databasepractice;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -14,6 +15,13 @@ public class AsterixService {
         return characterRepo.findAll();
     }
 
+    // todo: how is this usually done? exceptions?
+    public Character findById(String id){
+        if(characterRepo.findById(id).isPresent()){
+            return characterRepo.findById(id).get();
+        }
+        return null;
+    }
     public List<Character>  deleteById(String id){
         characterRepo.deleteById(id);
         return characterRepo.findAll();
@@ -27,6 +35,9 @@ public class AsterixService {
     // the solution is creation and modification timestamps
     public Character updateCharacter(CharacterDTO characterDTO){
         Character oldCharacter = characterRepo.findByName(characterDTO.name());
-        return characterRepo.save(new Character(oldCharacter.id(), characterDTO.name(), characterDTO.age(), characterDTO.occupation()));
+        return characterRepo.save(
+                new Character(oldCharacter.id(), characterDTO.name(), characterDTO.age(), characterDTO.occupation()));
     }
+
+
 }
