@@ -16,12 +16,12 @@ public class AsterixService {
     }
 
     // todo: how is this usually done? exceptions?
+    // todo: fix null return
     public Character findById(String id){
-        if(characterRepo.findById(id).isPresent()){
-            return characterRepo.findById(id).get();
-        }
-        return null;
+        Optional<Character> result = characterRepo.findById(id);
+        return result.orElse(null);
     }
+
     public List<Character>  deleteById(String id){
         characterRepo.deleteById(id);
         return characterRepo.findAll();
