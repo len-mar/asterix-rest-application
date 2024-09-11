@@ -1,10 +1,13 @@
 package org.example.databasepractice;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 import java.util.List;
 import java.util.Optional;
 
+import static org.example.databasepractice.IdService.generateId;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -80,5 +83,29 @@ AsterixService asterixService = new AsterixService(mockCharacterRepo);
 
         // then
         assertEquals(expected,actual);
+    }
+
+    @Test
+    void createCharacter_createsCharacter(){
+        // given
+        String mockId = "123";
+        try (MockedStatic<IdService> mockedStatic = Mockito.mockStatic(IdService.class)) {
+            // given
+            mockedStatic.when(IdService::generateId).thenReturn(mockId);
+            CharacterDTO newCharacterDTO = new CharacterDTO("Betarix", 20, "Beta");
+            Character expected = new Character(generateId(),"Betarix", 20, "Beta");
+            when(mockCharacterRepo.save(expected)).thenReturn(expected);
+
+            // when
+            Character actual = asterixService.createCharacter(newCharacterDTO);
+            verify(mockCharacterRepo).save(expected);
+
+            // then
+            assertEquals(expected, actual);
+        }
+
+
+
+
     }
 }

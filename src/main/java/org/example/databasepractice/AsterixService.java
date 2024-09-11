@@ -28,7 +28,7 @@ public class AsterixService {
     }
 
     public Character createCharacter(CharacterDTO characterDTO){
-        return characterRepo.save(new Character(UUID.randomUUID().toString(), characterDTO.name(), characterDTO.age(), characterDTO.occupation()));
+        return characterRepo.save(new Character(IdService.generateId(), characterDTO.name(), characterDTO.age(), characterDTO.occupation()));
     }
 
     // todo: is there another way other than creating a whole new character object? with timestamps, this would get tricky
