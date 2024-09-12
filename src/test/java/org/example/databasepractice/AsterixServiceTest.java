@@ -52,15 +52,15 @@ AsterixService asterixService = new AsterixService(mockCharacterRepo);
         assertThrows(NoSuchElementException.class, () -> asterixService.findById(id));
     }
 
-    // todo: actually test the delete
     @Test
     void deleteById() {
         // given
         String id = "1";
         Character expected = new Character(id, "Asterix", 50, "Alphawolf", Instant.now());
-        when(mockCharacterRepo.findAll()).thenReturn(List.of(expected));
+        when(mockCharacterRepo.findById(id)).thenReturn(Optional.of(expected));
         // when
         Character actual = asterixService.deleteById(id);
+        // then
         assertEquals(expected,actual);
     }
 
