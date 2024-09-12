@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.example.databasepractice.IdService.generateId;
+import static org.example.databasepractice.IdService.randomId;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -77,7 +77,7 @@ AsterixService asterixService = new AsterixService(mockCharacterRepo);
         when(mockCharacterRepo.findByName(oldCharacter.name())).thenReturn(oldCharacter);
         when(mockCharacterRepo.save(expected)).thenReturn(expected);
         // when
-        Character actual = asterixService.updateCharacter(newCharacterDTO);
+        Character actual = asterixService.updateCharacter(id, newCharacterDTO);
         verify(mockCharacterRepo).save(expected);
         verify(mockCharacterRepo).findByName(expected.name());
 
@@ -91,9 +91,9 @@ AsterixService asterixService = new AsterixService(mockCharacterRepo);
         String mockId = "123";
         try (MockedStatic<IdService> mockedStatic = Mockito.mockStatic(IdService.class)) {
             // given
-            mockedStatic.when(IdService::generateId).thenReturn(mockId);
+            mockedStatic.when(IdService::randomId).thenReturn(mockId);
             CharacterDTO newCharacterDTO = new CharacterDTO("Betarix", 20, "Beta");
-            Character expected = new Character(generateId(),"Betarix", 20, "Beta", Instant.now());
+            Character expected = new Character(randomId(),"Betarix", 20, "Beta", Instant.now());
             when(mockCharacterRepo.save(any())).thenReturn(expected);
 
             // when

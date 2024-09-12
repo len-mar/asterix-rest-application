@@ -3,33 +3,39 @@ package org.example.databasepractice;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import java.util.*;
-// TODO: * implement a endpoint in the AsterixController that returns a Character based on its id.
-//  implement a endpoint in the AsterixController that deletes a Character based on its id.
-//  implement a endpoint in the AsterixController that updates a Character based on its id.
 
 @RequiredArgsConstructor
 @RestController
+@RequestMapping("/api")
 public class AsterixController {
     private final AsterixService asterixService;
-
-    @GetMapping("/asterix/characters")
-    public List<Character> findAll(){
-        return asterixService.findAll();
-    }
-
-    @DeleteMapping("/asterix/characters/{id}")
-    public Character  deleteById(@PathVariable String id){
-        return asterixService.deleteById(id);
-    }
 
     @PostMapping("/asterix/characters/create")
     public Character createCharacter(@RequestBody CharacterDTO characterDTO){
         return asterixService.createCharacter(characterDTO);
     }
 
-    @PutMapping("/asterix/characters/update")
-    public Character updateCharacter(@RequestBody CharacterDTO characterDTO){
-        return asterixService.updateCharacter(characterDTO);
+    @GetMapping("/asterix/characters")
+    public List<Character> findAll(@RequestParam(required = false) Integer age){
+        if(age!=null){
+            return asterixService.findByAgeLessThanEqual(age);
+        }
+        return asterixService.findAll();
+    }
+
+    @GetMapping("/asterix/characters/{id}")
+    public Character  findById(@PathVariable String id){
+        return asterixService.findById(id);
+    }
+
+    @PutMapping("/asterix/characters/update/{id}")
+    public Character updateCharacter(@PathVariable String id, @RequestBody CharacterDTO characterDTO){
+        return asterixService.updateCharacter(id, characterDTO);
+    }
+
+    @DeleteMapping("/asterix/characters/{id}")
+    public Character  deleteById(@PathVariable String id){
+        return asterixService.deleteById(id);
     }
 
 
